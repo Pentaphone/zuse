@@ -1,26 +1,35 @@
+//# Zuse
+
+//### Config
+const program = conway; 
+
+const rows = 50;
+const cols = 50;
+const cellSize = 12;
+
+const updateInterval = 600  // ms per update
+
+
 //### Constants
+const headline = document.getElementById("headline")
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 const pauseButton = document.getElementById("pause");
+const resetButton = document.getElementById("reset");
 const speed1xButton = document.getElementById("speed1x");
 const speed2xButton = document.getElementById("speed2x");
 const speed10xButton = document.getElementById("speed10x");
 
-const updateInterval = 500  // ms per update
 let   speed = 1;
 
 let   probOutput = document.getElementById("probOutput")
 const probSlider = document.getElementById("probSlider")
 const addButton = document.getElementById("add");
 
-const rows = 50;
-const cols = 50;
-const cellSize = 15;
-
 // false: black, true: white
 const grid = new Uint8Array(rows * cols);
-
+let   saved = grid.slice();
 
 //### Functions
 function get(x, y) {
@@ -57,30 +66,48 @@ function fillRand(prob = 0.33) {
     }
 }
 
+function title(title) {
+  document.title = title;
+  headline.innerHTML = title;
+}
 
-// Control
+
+//### Canvas
+canvas.width = rows*cellSize;
+canvas.height = cols*cellSize;
+
+
+//### Draw
+canvas.addEventListener("mousedown", (event) => {
+  const rect = canvas.getBoundingClientRect();
+
+  const x = Math.floor(
+      (event.clientX - rect.left) / cellSize
+  );
+  const y = Math.floor(
+      (event.clientY - rect.top) / cellSize
+  );
+
+  if (x >= 0 && x < cols && y >= 0 && y < rows) {
+    const newState = !(get(x, y));
+    set(x, y, newState);
+    saved = grid.slice();
+    drawImg();
+  }
+});
+
+
+//### Controls
 speed1xButton.onclick = () => {speed = 1}
 speed2xButton.onclick = () => {speed = 2}
 speed10xButton.onclick = () => {speed = 10}
 
+resetButton.onclick = () => {
+  grid.set(saved);
+  drawImg();
+}
+
 var prob = probSlider.value / 100;
-
-canvas.addEventListener("mousedown", (event) => {
-    const rect = canvas.getBoundingClientRect();
-
-    const x = Math.floor(
-        (event.clientX - rect.left) / cellSize
-    );
-    const y = Math.floor(
-        (event.clientY - rect.top) / cellSize
-    );
-
-    if (x >= 0 && x < cols && y >= 0 && y < rows) {
-        const newState = !(get(x, y));
-        set(x, y, newState);
-        drawImg();
-    }
-});
 
 probSlider.oninput = function() {
     prob = probSlider.value / 100;
@@ -92,45 +119,43 @@ addButton.addEventListener("click", () => {
     drawImg();
 });
 
-fillRand();
-drawImg();
-
-
-//### Canvas
-canvas.width = rows*cellSize;
-canvas.height = cols*cellSize;
 
 //### Animation
 function update() {
-    fillRand(prob);
+  const nextGrid = new Uint8Array(rows * cols);
+
+  function set(x, y, value) {
+    nextGrid[y * cols + x] = value;
+  }
+  
+  program(set)
+
+  grid.set(nextGrid);
 }
 
 function drawImg() {
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
 
-            ctx.fillStyle = get(x, y) ? "white" : "black";
-            ctx.fillRect(
-                x * cellSize,
-                y * cellSize,
-                cellSize,
-                cellSize
-            );
+      ctx.fillStyle = get(x, y) ? "white" : "black";
+      ctx.fillRect(
+        x * cellSize,
+        y * cellSize,
+        cellSize,
+        cellSize
+      );
 
-            ctx.strokeStyle = "DimGray";
-            ctx.strokeRect(
-                x * cellSize,
-                y * cellSize,
-                cellSize,
-                cellSize
-            );
-        }
-    }
-}
-
+      ctx.strokeStyle = "DimGray";
+      ctx.strokeRect(
+        x * cellSize,
+        y * cellSize,
+        cellSize,
+        cellSize
+      );
+} } }
 
 let play = true;
 let frame = 0;
@@ -157,6 +182,8 @@ function startAnimation() {
   requestAnimationFrame(animate);
 }
 
+fillRand();
+drawImg();
 startAnimation()
 
 pauseButton.onclick = () => {play = !play}
