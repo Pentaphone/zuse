@@ -1,9 +1,10 @@
 //# Zuse
 
-//### Constants
+//### Constants and Variables
 const headline = document.getElementById("headline")
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const generationDisplay = document.getElementById("generation");
 
 const pauseButton = document.getElementById("pause");
 const resetButton = document.getElementById("reset");
@@ -12,6 +13,7 @@ const speed2xButton = document.getElementById("speed2x");
 const speed10xButton = document.getElementById("speed10x");
 
 let   speed = 1;
+let   generation = 0;
 
 let   probOutput = document.getElementById("probOutput")
 const probSlider = document.getElementById("probSlider")
@@ -88,6 +90,7 @@ canvas.addEventListener("mousedown", (event) => {
     const newState = !(get(x, y));
     set(x, y, newState);
     saved = grid.slice();
+    generation = 0;
     drawImg();
   }
 });
@@ -100,7 +103,7 @@ speed10xButton.onclick = () => {speed = 10}
 
 resetButton.onclick = () => {
   grid.set(saved);
-  drawImg();
+  generation = 0;
 }
 
 var prob = probSlider.value / 100;
@@ -113,16 +116,18 @@ probSlider.oninput = function() {
 addButton.addEventListener("click", () => {
     fillRand(prob);
     drawImg();
+    generation = 0;
 });
 
 
 //### Animation
 function update() {
-  
-  program()
-
-  grid.set(nextGrid);
   nextGrid = new Uint8Array(rows * cols);
+
+  program();
+  grid.set(nextGrid);
+
+  generation += 1;
 }
 
 function drawImg() {
@@ -160,6 +165,7 @@ function animate(timestamp) {
   }}
 
   drawImg();
+  generationDisplay.innerHTML = `Generation: ${generation}`
 
   pauseButton.innerHTML = {
     true: "\u23F8",   // pause symbol
