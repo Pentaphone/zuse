@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<head>
+	<title></title>
+	<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+	<h1 id="headline">_</h1>
+	<canvas id="canvas"></canvas> <br>
+	<br>
+
+	<div id="simControls">
+	<button id="pause">P</button>
+	<div class="spacing"></div>
+	<button id="reset">&#x23EE</button>
+	<div class="spacing"></div>
+	Speed: 
+	<button id="speed1x">1x</button>
+	<button id="speed2x">2x</button>
+	<button id="speed10x">10x</button>
+
+	</div>
+	<br>
+
+	<div id="probOutput">Density: 0.5</div>
+	<input type="range" min="0" max="100" value="50" class="slider" id="probSlider">
+	<button id="add">Add</button>
+	
+</body>
+
+<script src="programs/conway.js"></script>
+<script src="programs/highlife.js"></script>
+<script src="main.js"></script>
