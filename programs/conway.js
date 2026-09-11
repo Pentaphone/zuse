@@ -1,4 +1,4 @@
-const conway = (set) => {
+const conway = () => {
   title("Conway's Game of Life")
 
   for (let y = 0; y < rows; y++) {
@@ -14,5 +14,3 @@ const conway = (set) => {
         // Be born with 3 neighbors
         set(x, y, neighbors===3 ? 1 : 0);
   } } }
-
-}

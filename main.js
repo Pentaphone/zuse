@@ -30,6 +30,8 @@ const addButton = document.getElementById("add");
 // false: black, true: white
 const grid = new Uint8Array(rows * cols);
 let   saved = grid.slice();
+let   nextGrid = new Uint8Array(rows * cols);
+
 
 //### Functions
 function get(x, y) {
@@ -37,8 +39,8 @@ function get(x, y) {
 }
 
 function set(x, y, value) {
-  grid[y * cols + x] = value;
-}
+    nextGrid[y * cols + x] = value;
+  }
 
 function countNeighbors(x, y) {
   let count = 0;
@@ -81,6 +83,10 @@ canvas.height = cols*cellSize;
 canvas.addEventListener("mousedown", (event) => {
   const rect = canvas.getBoundingClientRect();
 
+  function set(x, y, value) {
+    grid[y * cols + x] = value;
+  }
+
   const x = Math.floor(
       (event.clientX - rect.left) / cellSize
   );
@@ -122,15 +128,11 @@ addButton.addEventListener("click", () => {
 
 //### Animation
 function update() {
-  const nextGrid = new Uint8Array(rows * cols);
-
-  function set(x, y, value) {
-    nextGrid[y * cols + x] = value;
-  }
   
-  program(set)
+  program()
 
   grid.set(nextGrid);
+  nextGrid = new Uint8Array(rows * cols);
 }
 
 function drawImg() {
